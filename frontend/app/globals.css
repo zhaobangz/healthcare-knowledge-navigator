@@ -1,0 +1,131 @@
+@import "tailwindcss";
+
+/* Palette: chart-paper mint-gray page, slate-teal ink, surgical-teal actions.
+   One loud element only: the highlighter yellow that marks cited text (MMWR itself uses
+   yellow highlighting to mark updated guidance). */
+@theme {
+  --color-paper: #eef3f1;
+  --color-surface: #ffffff;
+  --color-ink: #12312e;
+  --color-ink-soft: #4a615e;
+  --color-ink-faint: #7d908d;
+  --color-rule: #d3dedb;
+  --color-teal: #0f6e66;
+  --color-teal-deep: #0a524c;
+  --color-teal-wash: #e1efec;
+  --color-marker: #ffe45c;
+  --color-marker-soft: #fff4b8;
+  --color-marker-ink: #12312e; /* text on the highlighter stays dark in both themes */
+  --color-on-teal: #ffffff;
+  --color-ok: #2f7d4f;
+  --color-warn: #a86a12;
+  --color-bad: #b42318;
+  --color-bad-wash: #fdecea;
+  --color-quiet: #66777a;
+
+  --font-sans: var(--font-public-sans), ui-sans-serif, system-ui, sans-serif;
+  --font-serif: var(--font-source-serif), ui-serif, Georgia, serif;
+}
+
+/* Dark theme: night-shift reading. Same structure, teal-black paper, the highlighter
+   unchanged so cited text is just as findable. */
+@media (prefers-color-scheme: dark) {
+  :root {
+    --color-paper: #0e1918;
+    --color-surface: #142321;
+    --color-ink: #e2ecea;
+    --color-ink-soft: #a7bbb7;
+    --color-ink-faint: #7b908c;
+    --color-rule: #253836;
+    --color-teal: #4fb7ac;
+    --color-teal-deep: #86d3c9;
+    --color-teal-wash: #173936;
+    --color-marker-soft: #4a4421;
+    --color-ok: #62c088;
+    --color-warn: #e2ab4c;
+    --color-bad: #f07a6f;
+    --color-bad-wash: #3a1c19;
+    --color-quiet: #8c9d9f;
+    --color-on-teal: #0e1918;
+  }
+}
+
+@layer base {
+  :root {
+    color-scheme: light dark; /* the page themes itself; stops browser auto-darkening */
+  }
+  html {
+    background: var(--color-paper);
+    color: var(--color-ink);
+  }
+  body {
+    font-family: var(--font-sans);
+    font-size: 15px;
+    line-height: 1.5;
+    -webkit-font-smoothing: antialiased;
+  }
+  :focus-visible {
+    outline: 2px solid var(--color-teal);
+    outline-offset: 2px;
+    border-radius: 3px;
+  }
+  ::selection {
+    background: var(--color-marker-soft);
+  }
+}
+
+@layer components {
+  /* Claim support marks: only weak, conflicting and uncited statements are marked, so a
+     fully supported answer reads clean. */
+  .claim-weak {
+    text-decoration: underline dotted var(--color-warn);
+    text-decoration-thickness: 2px;
+    text-underline-offset: 5px;
+  }
+  .claim-conflict {
+    text-decoration: underline wavy var(--color-bad);
+    text-decoration-thickness: 1.5px;
+    text-underline-offset: 5px;
+    background: var(--color-bad-wash);
+  }
+  .claim-uncited {
+    text-decoration: underline dashed var(--color-quiet);
+    text-decoration-thickness: 1px;
+    text-underline-offset: 5px;
+  }
+
+  .marker {
+    background: linear-gradient(transparent 8%, var(--color-marker) 8%, var(--color-marker) 92%, transparent 92%);
+    box-decoration-break: clone;
+    -webkit-box-decoration-break: clone;
+    color: var(--color-marker-ink);
+    padding: 0 1px;
+  }
+
+  .caret::after {
+    content: "";
+    display: inline-block;
+    width: 0.5ch;
+    height: 1.05em;
+    margin-left: 2px;
+    vertical-align: -0.15em;
+    background: var(--color-teal);
+    animation: blink 1s steps(1) infinite;
+  }
+}
+
+@keyframes blink {
+  50% {
+    opacity: 0;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .caret::after {
+    animation: none;
+  }
+  * {
+    scroll-behavior: auto !important;
+    transition-duration: 0ms !important;
+  }
+}

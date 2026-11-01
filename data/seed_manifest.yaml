@@ -1,0 +1,227 @@
+# Seed corpus: clinical guidelines, protocols and drug labels from US-government sources.
+#
+# Raw files are fetched into data/raw/ (gitignored) by `make ingest-seed`; nothing here
+# is redistributed. Every entry records its license so the source panel can show it.
+#
+#   CDC MMWR        "All material in the MMWR Series is in the public domain and may be
+#                    used and reprinted without permission; citation as to source,
+#                    however, is appreciated."
+#   NCI (cancer.gov) Text is free of copyright; credit the National Cancer Institute. The
+#                    PDQ® trademark may only be used for wholly unchanged reproductions, so
+#                    excerpts are titled without it and attributed to NCI.
+#   USPSTF (AHRQ)   May be reproduced unchanged and non-commercially; cite the USPSTF web
+#                    page as the source. We only quote verbatim sentences, with citations.
+#   DailyMed (NLM)  FDA-approved labeling, US-government public information.
+#
+# parser.kind: html | spl | jats.  For html, `root` is the CSS selector of the content
+# container; `start_heading` / `stop_headings` / `skip_headings` are case-insensitive
+# regexes on heading text. `skip_headings` skips a section and its subsections.
+
+defaults:
+  user_agent: "Mozilla/5.0 (hkn-research-bot; educational RAG project)"
+
+documents:
+  # ---------------------------------------------------------------- infectious disease
+  - source_key: cdc-sti-2021
+    title: "Sexually Transmitted Infections Treatment Guidelines, 2021"
+    org: CDC
+    doc_type: guideline
+    specialty: [infectious_disease]
+    pub_year: 2021
+    version: "MMWR Recomm Rep 2021;70(No. RR-4)"
+    url: https://www.cdc.gov/mmwr/volumes/70/rr/rr7004a1.htm
+    license: "Public domain (CDC MMWR)"
+    parser:
+      kind: html
+      root: main
+      start_heading: "^(Introduction|Background)$"
+      stop_headings: ["^References$"]
+      skip_headings: ["Work ?Group", "Disclosure of Relationship", "Conflicts? of Interest", "^Acknowledg", "^Contributors$"]
+      strip_numeric_italics: true
+
+  - source_key: cdc-doxypep-2024
+    title: "CDC Clinical Guidelines on the Use of Doxycycline Postexposure Prophylaxis for Bacterial STI Prevention"
+    org: CDC
+    doc_type: guideline
+    specialty: [infectious_disease]
+    pub_year: 2024
+    version: "MMWR Recomm Rep 2024;73(No. RR-2)"
+    url: https://www.cdc.gov/mmwr/volumes/73/rr/rr7302a1.htm
+    license: "Public domain (CDC MMWR)"
+    parser:
+      kind: html
+      root: main
+      start_heading: "^(Introduction|Background)$"
+      stop_headings: ["^References$"]
+      skip_headings: ["Work ?Group", "Disclosure of Relationship", "Conflicts? of Interest", "^Acknowledg", "^Contributors$"]
+      strip_numeric_italics: true
+
+  # ------------------------------------------------------------------------ hepatology
+  - source_key: cdc-hbv-screening-2023
+    title: "Screening and Testing for Hepatitis B Virus Infection: CDC Recommendations — United States, 2023"
+    org: CDC
+    doc_type: guideline
+    specialty: [hepatology, infectious_disease]
+    pub_year: 2023
+    version: "MMWR Recomm Rep 2023;72(No. RR-1)"
+    url: https://www.cdc.gov/mmwr/volumes/72/rr/rr7201a1.htm
+    license: "Public domain (CDC MMWR)"
+    parser:
+      kind: html
+      root: main
+      start_heading: "^(Introduction|Background)$"
+      stop_headings: ["^References$"]
+      skip_headings: ["Work ?Group", "Disclosure of Relationship", "Conflicts? of Interest", "^Acknowledg", "^Contributors$"]
+      strip_numeric_italics: true
+
+  - source_key: cdc-hcv-screening-2020
+    title: "CDC Recommendations for Hepatitis C Screening Among Adults — United States, 2020"
+    org: CDC
+    doc_type: guideline
+    specialty: [hepatology, infectious_disease]
+    pub_year: 2020
+    version: "MMWR Recomm Rep 2020;69(No. RR-2)"
+    url: https://www.cdc.gov/mmwr/volumes/69/rr/rr6902a1.htm
+    license: "Public domain (CDC MMWR)"
+    parser:
+      kind: html
+      root: main
+      start_heading: "^(Introduction|Background)$"
+      stop_headings: ["^References$"]
+      skip_headings: ["Work ?Group", "Disclosure of Relationship", "Conflicts? of Interest", "^Acknowledg", "^Contributors$"]
+      strip_numeric_italics: true
+
+  # ------------------------------------------------------------------- pain management
+  - source_key: cdc-opioids-2022
+    title: "CDC Clinical Practice Guideline for Prescribing Opioids for Pain — United States, 2022"
+    org: CDC
+    doc_type: guideline
+    specialty: [pain_management]
+    pub_year: 2022
+    version: "MMWR Recomm Rep 2022;71(No. RR-3)"
+    url: https://www.cdc.gov/mmwr/volumes/71/rr/rr7103a1.htm
+    license: "Public domain (CDC MMWR)"
+    parser:
+      kind: html
+      root: main
+      start_heading: "^(Introduction|Background)$"
+      stop_headings: ["^References$"]
+      skip_headings: ["Work ?Group", "Disclosure of Relationship", "Conflicts? of Interest", "^Acknowledg", "^Contributors$"]
+      strip_numeric_italics: true
+
+  # ------------------------------------------------------------------------- oncology
+  - source_key: nci-breast-treatment-hp
+    title: "Breast Cancer Treatment — Health Professional Version (excerpts)"
+    org: NCI
+    doc_type: protocol
+    specialty: [oncology]
+    pub_year: 2025
+    version: "cancer.gov, retrieved at ingest"
+    url: https://www.cancer.gov/types/breast/hp/breast-treatment-pdq
+    license: "Free of copyright; originally published by the National Cancer Institute"
+    parser:
+      kind: html
+      root: "#cgvBody"
+      stop_headings: ["^Latest Updates to This Summary", "^About This PDQ Summary"]
+      skip_headings: ["^Current Clinical Trials$"]
+      drop: ['ol:has(> li[id^="section_"])']  # per-section reference lists
+
+  - source_key: nci-colon-treatment-hp
+    title: "Colon Cancer Treatment — Health Professional Version (excerpts)"
+    org: NCI
+    doc_type: protocol
+    specialty: [oncology]
+    pub_year: 2025
+    version: "cancer.gov, retrieved at ingest"
+    url: https://www.cancer.gov/types/colorectal/hp/colon-treatment-pdq
+    license: "Free of copyright; originally published by the National Cancer Institute"
+    parser:
+      kind: html
+      root: "#cgvBody"
+      stop_headings: ["^Latest Updates to This Summary", "^About This PDQ Summary"]
+      skip_headings: ["^Current Clinical Trials$"]
+      drop: ['ol:has(> li[id^="section_"])']  # per-section reference lists
+
+  - source_key: uspstf-breast-screening-2024
+    title: "Breast Cancer: Screening — Final Recommendation Statement"
+    org: USPSTF
+    doc_type: guideline
+    specialty: [oncology]
+    pub_year: 2024
+    version: "April 30, 2024"
+    url: https://www.uspreventiveservicestaskforce.org/uspstf/recommendation/breast-cancer-screening
+    license: "USPSTF/AHRQ: verbatim, non-commercial reuse; USPSTF web page cited as source"
+    parser:
+      kind: html
+      root: article
+      start_heading: "^Recommendation Summary$"
+      stop_headings: ["^References$", "^Copyright Notice$"]
+      skip_headings: ["^Additional Information$", "^Recommendation Information$", "^Additional Tools and Resources$", "^Response to Public Comments?$"]
+
+  - source_key: uspstf-crc-screening-2021
+    title: "Colorectal Cancer: Screening — Final Recommendation Statement"
+    org: USPSTF
+    doc_type: guideline
+    specialty: [oncology]
+    pub_year: 2021
+    version: "May 18, 2021"
+    url: https://www.uspreventiveservicestaskforce.org/uspstf/recommendation/colorectal-cancer-screening
+    license: "USPSTF/AHRQ: verbatim, non-commercial reuse; USPSTF web page cited as source"
+    parser:
+      kind: html
+      root: article
+      start_heading: "^Recommendation Summary$"
+      stop_headings: ["^References$", "^Copyright Notice$"]
+      skip_headings: ["^Additional Information$", "^Recommendation Information$", "^Additional Tools and Resources$", "^Response to Public Comments?$"]
+
+  # ---------------------------------------------------------------------- drug labels
+  - source_key: dailymed-ceftriaxone
+    title: "Ceftriaxone Injection, USP (in Dextrose) — Prescribing Information"
+    org: FDA/DailyMed
+    doc_type: drug_label
+    specialty: [infectious_disease]
+    pub_year: 2026
+    version: "SPL set 4c5c2d3f-5038-41a1-a2fe-4dcd048dbac1, latest at ingest"
+    url: https://dailymed.nlm.nih.gov/dailymed/services/v2/spls/4c5c2d3f-5038-41a1-a2fe-4dcd048dbac1.xml
+    display_url: https://dailymed.nlm.nih.gov/dailymed/drugInfo.cfm?setid=4c5c2d3f-5038-41a1-a2fe-4dcd048dbac1
+    license: "FDA-approved labeling (US-government public information, via NLM DailyMed)"
+    parser:
+      kind: spl
+
+  - source_key: dailymed-doxycycline
+    title: "Doxycycline Hyclate — Prescribing Information"
+    org: FDA/DailyMed
+    doc_type: drug_label
+    specialty: [infectious_disease]
+    pub_year: 2026
+    version: "SPL set 3e7cf78f-3b48-4614-9fa4-c6d1e0c05a35, latest at ingest"
+    url: https://dailymed.nlm.nih.gov/dailymed/services/v2/spls/3e7cf78f-3b48-4614-9fa4-c6d1e0c05a35.xml
+    display_url: https://dailymed.nlm.nih.gov/dailymed/drugInfo.cfm?setid=3e7cf78f-3b48-4614-9fa4-c6d1e0c05a35
+    license: "FDA-approved labeling (US-government public information, via NLM DailyMed)"
+    parser:
+      kind: spl
+
+  - source_key: dailymed-buprenorphine-naloxone
+    title: "Buprenorphine and Naloxone Sublingual Tablets — Prescribing Information"
+    org: FDA/DailyMed
+    doc_type: drug_label
+    specialty: [pain_management]
+    pub_year: 2026
+    version: "SPL set c5fbec69-e7de-44a8-b9fa-0378ae61a9fe, latest at ingest"
+    url: https://dailymed.nlm.nih.gov/dailymed/services/v2/spls/c5fbec69-e7de-44a8-b9fa-0378ae61a9fe.xml
+    display_url: https://dailymed.nlm.nih.gov/dailymed/drugInfo.cfm?setid=c5fbec69-e7de-44a8-b9fa-0378ae61a9fe
+    license: "FDA-approved labeling (US-government public information, via NLM DailyMed)"
+    parser:
+      kind: spl
+
+# PMC Open Access topics for `make ingest-pmc` (CC BY / CC0 only; same specialties so
+# guideline and literature evidence overlap).
+pmc_topics:
+  - specialty: infectious_disease
+    query: '(gonorrhea[tiab] OR chlamydia[tiab] OR syphilis[tiab] OR "doxycycline postexposure prophylaxis"[tiab]) AND (treatment[tiab] OR prophylaxis[tiab])'
+  - specialty: hepatology
+    query: '("hepatitis B"[tiab] OR "hepatitis C"[tiab]) AND (screening[tiab] OR testing[tiab])'
+  - specialty: pain_management
+    query: '(opioid[tiab] AND (prescribing[tiab] OR tapering[tiab] OR "chronic pain"[tiab])) OR buprenorphine[tiab]'
+  - specialty: oncology
+    query: '("breast cancer"[tiab] OR "colorectal cancer"[tiab] OR "colon cancer"[tiab]) AND (screening[tiab] OR "adjuvant"[tiab])'

@@ -1,0 +1,23 @@
+# Postgres + pgvector only. The API and web app run on the host (`make dev`) so the
+# sentence-transformers models use the local torch install instead of a multi-GB image.
+services:
+  db:
+    image: pgvector/pgvector:pg17
+    container_name: hkn-db
+    environment:
+      POSTGRES_USER: hkn
+      POSTGRES_PASSWORD: hkn
+      POSTGRES_DB: hkn
+    ports:
+      - "5434:5432"
+    volumes:
+      - hkn_pg:/var/lib/postgresql/data
+      - ./docker/initdb:/docker-entrypoint-initdb.d:ro
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U hkn -d hkn"]
+      interval: 2s
+      timeout: 3s
+      retries: 30
+
+volumes:
+  hkn_pg:

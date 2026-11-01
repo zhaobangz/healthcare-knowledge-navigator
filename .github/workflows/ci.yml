@@ -1,0 +1,65 @@
+name: ci
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  backend:
+    runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: pgvector/pgvector:pg17
+        env:
+          POSTGRES_USER: hkn
+          POSTGRES_PASSWORD: hkn
+          POSTGRES_DB: hkn_test
+        ports: ["5434:5432"]
+        options: >-
+          --health-cmd "pg_isready -U hkn -d hkn_test"
+          --health-interval 2s --health-timeout 3s --health-retries 30
+    defaults:
+      run:
+        working-directory: backend
+    env:
+      HKN_DATABASE_URL: postgresql+psycopg://hkn:hkn@localhost:5434/hkn_test
+      HKN_TEST_DATABASE_URL: postgresql+psycopg://hkn:hkn@localhost:5434/hkn_test
+    steps:
+      - uses: actions/checkout@v4
+      - uses: astral-sh/setup-uv@v5
+      - name: Install
+        # CPU-only torch keeps the job small; models are never downloaded in CI.
+        run: uv sync --python 3.12
+      - name: Lint
+        run: |
+          .venv/bin/python -m ruff check src evals tests alembic
+          .venv/bin/python -m ruff format --check src evals tests alembic
+          .venv/bin/python -m pyright src evals
+      - name: Unit tests
+        run: .venv/bin/python -m pytest -q
+      - name: Integration tests (pgvector, fake embedders)
+        run: |
+          psql postgresql://hkn:hkn@localhost:5434/hkn_test -c "CREATE EXTENSION IF NOT EXISTS vector"
+          .venv/bin/python -m pytest -q -m integration
+
+  frontend:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: frontend
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: frontend/package-lock.json
+      - run: npm ci
+      - run: npm run lint
+      - run: npm run typecheck
+      - run: npm test -- --run
+      - run: npm run build

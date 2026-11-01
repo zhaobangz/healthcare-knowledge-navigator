@@ -1,0 +1,41 @@
+# Python
+.venv/
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.ruff_cache/
+.mypy_cache/
+*.egg-info/
+.coverage
+htmlcov/
+
+# Secrets — never commit
+.env
+.env.*
+!.env.example
+
+# Corpus cache (re-fetchable; licenses recorded in data/seed_manifest.yaml)
+data/raw/
+data/pmc/
+data/runs/
+
+# Model caches
+.hf_cache/
+
+# Node / Next.js
+frontend/node_modules/
+frontend/.next/
+frontend/out/
+frontend/next-env.d.ts
+frontend/coverage/
+
+# OS / editors
+.DS_Store
+.idea/
+.vscode/
+
+# Local tool state
+.claude/
+**/.claude/
+*.tsbuildinfo
+.vitest/
